@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trollstore l beta</title>
+  <!-- Подключаем манифест для PWA -->
+  <link rel="manifest" href="manifest.json">
+  <style>
+    /* Общие стили */
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background-color: #f0f0f0;
+      overflow-x: hidden;
+    }
+    /* Экран загрузки */
+    .loading-screen {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: #222;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2rem;
+      z-index: 1000;
+    }
+    /* Основное меню */
+    #main {
+      padding: 20px;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2.5rem;
+    }
+    header p {
+      margin: 5px 0 0;
+      font-size: 1rem;
+      color: #555;
+    }
+    /* Нижние кнопки */
+    #bottomButtons {
+      position: fixed;
+      bottom: 20px;
+      left: 0;
+      right: 0;
+      text-align: center;
+    }
+    #bottomButtons button {
+      margin: 0 10px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 5px;
+      background-color: #007aff;
+      color: #fff;
+      cursor: pointer;
+    }
+    /* Модальное окно выбора */
+    .modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      z-index: 1100;
+      text-align: center;
+    }
+    .modal h2 {
+      margin-bottom: 20px;
+    }
+    .modal button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 5px;
+      background-color: #28a745;
+      color: #fff;
+      cursor: pointer;
+    }
+    /* Верхнее выдвижное меню (rounded) */
+    .top-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #fff;
+      padding: 10px;
+      border-bottom-left-radius: 20px;
+      border-bottom-right-radius: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      z-index: 1050;
+      display: flex;
+      justify-content: center;
+    }
+    .top-menu ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+    }
+    .top-menu li {
+      margin: 0 10px;
+      padding: 10px 15px;
+      cursor: pointer;
+      border-radius: 10px;
+      background-color: #e0e0e0;
+      user-select: none;
+    }
+    .top-menu li.active {
+      background-color: #007aff;
+      color: #fff;
+    }
+    .top-menu li.disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+    /* Содержимое вкладок */
+    .tab-content {
+      margin-top: 70px;
+      padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .tab-panel {
+      display: none;
+    }
+    .tab-panel.active {
+      display: block;
+    }
+    .tab-panel label {
+      display: block;
+      margin: 10px 0;
+      font-size: 1.1rem;
+    }
+    /* Кнопка Overlay Mode */
+    #overlayButton {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      background-color: #ff9500;
+      color: #fff;
+      cursor: pointer;
+      z-index: 1050;
+    }
+    /* Пример стиля для overlay mode */
+    .overlay-mode {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <!-- Экран загрузки -->
+  <div id="loading" class="loading-screen">
+    Загрузка...
+  </div>
+
+  <div id="main" style="display: none;">
+    <!-- Заголовок -->
+    <header>
+      <h1>Trollstore l beta</h1>
+      <p>17+ by Qweek</p>
+    </header>
+
+    <!-- Модальное окно для выбора -->
+    <div id="modal" class="modal">
+      <h2>User kernel</h2>
+      <button id="runButton">Run</button>
+    </div>
+
+    <!-- Верхнее выдвижное меню с вкладками -->
+    <nav id="topMenu" class="top-menu" style="display: none;">
+      <ul>
+        <li class="tab disabled">Aimb(no)</li>
+        <li class="tab" data-tab="esp">Esp</li>
+        <li class="tab" data-tab="misc">Misc</li>
+      </ul>
+    </nav>
+
+    <!-- Содержимое вкладок -->
+    <div id="tabContent" class="tab-content" style="display: none;">
+      <!-- Вкладка Esp -->
+      <div id="espTab" class="tab-panel active">
+        <label><input type="checkbox" id="espBox"> Esp box</label>
+        <label><input type="checkbox" id="espSkeleton"> Esp skeleton</label>
+        <label><input type="checkbox" id="espHp"> Esp hp</label>
+      </div>
+      <!-- Вкладка Misc -->
+      <div id="miscTab" class="tab-panel">
+        <p>Misc content goes here</p>
+      </div>
+    </div>
+
+    <!-- Нижние кнопки -->
+    <div id="bottomButtons">
+      <button id="settingsButton">Settings</button>
+      <button id="creditsButton">Credits</button>
+    </div>
+
+    <!-- Кнопка для Overlay Mode -->
+    <button id="overlayButton">Overlay Mode</button>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Имитируем задержку загрузки
+      setTimeout(function() {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('main').style.display = 'block';
+      }, 2000);
+
+      // Обработчик кнопки Run в модальном окне
+      document.getElementById('runButton').addEventListener('click', function() {
+        document.getElementById('modal').style.display = 'none';
+        document.getElementById('topMenu').style.display = 'flex';
+        document.getElementById('tabContent').style.display = 'block';
+      });
+
+      // Обработка кликов по вкладкам
+      var tabs = document.querySelectorAll('.top-menu .tab');
+      tabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          // Если вкладка отключена, выходим
+          if (tab.classList.contains('disabled')) return;
+          // Снимаем выделение со всех вкладок
+          tabs.forEach(function(t){ t.classList.remove('active'); });
+          tab.classList.add('active');
+          // Отображаем содержимое выбранной вкладки
+          var selected = tab.getAttribute('data-tab');
+          if (selected === 'esp') {
+            document.getElementById('espTab').classList.add('active');
+            document.getElementById('miscTab').classList.remove('active');
+          } else if (selected === 'misc') {
+            document.getElementById('miscTab').classList.add('active');
+            document.getElementById('espTab').classList.remove('active');
+          }
+        });
+      });
+
+      // Обработчик кнопки Overlay Mode
+      document.getElementById('overlayButton').addEventListener('click', function() {
+        document.body.classList.toggle('overlay-mode');
+      });
+
+      // Пример обработки свайпа (для упрощённого примера)
+      let startX;
+      const tabContent = document.getElementById('tabContent');
+      tabContent.addEventListener('touchstart', function(e) {
+        startX = e.touches[0].clientX;
+      });
+      tabContent.addEventListener('touchmove', function(e) {
+        let diff = e.touches[0].clientX - startX;
+        // Если смахивание вправо или влево более 50px, скрываем/показываем меню
+        if (Math.abs(diff) > 50) {
+          if (diff > 0) {
+            tabContent.style.transform = 'translateX(100%)';
+          } else {
+            tabContent.style.transform = 'translateX(0)';
+          }
+        }
+      });
+    });
+  </script>
+</body>
+  </html>
