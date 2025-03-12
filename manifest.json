@@ -1,10 +1,10 @@
 {
-  "name": "Trollstore l beta",
-  "short_name": "Trollstore",
+  "name": "TrollStore",
+  "short_name": "TrollStore",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#007aff",
+  "theme_color": "#7a00fa",
   "icons": [
     {
       "src": "icon-192.png",
