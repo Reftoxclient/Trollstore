@@ -2,13 +2,12 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qweek standoff 2</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Uicache - TrollStore</title>
 
-  <!-- Пример манифеста PWA (при необходимости) -->
-  <link rel="manifest" href="manifest.json" />
+  <!-- Мета-теги для PWA, если нужно -->
+  <!-- <link rel="manifest" href="manifest.json"> -->
 
-  <!-- Стили (для удобства всё в одном файле) -->
   <style>
     * {
       margin: 0; 
@@ -17,90 +16,140 @@
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      overflow: hidden; /* чтобы не было прокрутки */
+      background: #000;
+      overflow: hidden; /* убираем прокрутку, если хотите */
     }
 
-    /* ---------- Главный экран (градиент) ---------- */
-    #mainScreen {
+    /****************************************
+     *   ЭКРАН ПРИВЕТСТВИЯ (GLASS/GRADIENT)  *
+     ****************************************/
+    #welcomeScreen {
       position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: linear-gradient(135deg, #ff0000, #000000);
+      inset: 0; /* top:0; right:0; bottom:0; left:0; */
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      background: linear-gradient(180deg, #1d006e, #000000 80%);
       color: #fff;
-      animation: fadeIn 0.5s forwards;
+      animation: fadeIn 0.8s forwards;
+      z-index: 1000;
     }
     @keyframes fadeIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
+      0%   { opacity: 0; }
+      100% { opacity: 1; }
     }
     @keyframes fadeOut {
-      from { opacity: 1; }
-      to   { opacity: 0; }
+      0%   { opacity: 1; }
+      100% { opacity: 0; }
     }
     .hide {
-      animation: fadeOut 0.5s forwards;
+      animation: fadeOut 0.6s forwards;
+    }
+
+    /* Анимация «снежинок» (snomations) */
+    #snowContainer {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .snow {
+      position: absolute;
+      top: -10px;
+      width: 10px;
+      height: 10px;
+      background: radial-gradient(#fff, rgba(255,255,255,0.2));
+      border-radius: 50%;
+      animation-name: fall;
+      animation-timing-function: linear;
+    }
+    @keyframes fall {
+      to {
+        transform: translateY(120vh);
+      }
     }
 
     .app-icon {
-      width: 80px;
-      height: 80px;
-      border-radius: 15px;
+      width: 100px;
+      height: 100px;
+      border-radius: 20px;
       margin-bottom: 20px;
+      animation: scaleUp 0.7s ease forwards;
+      opacity: 0;
+    }
+    @keyframes scaleUp {
+      0%   { transform: scale(0.6); opacity: 0; }
+      100% { transform: scale(1);   opacity: 1; }
     }
     .main-title {
-      font-size: 1.8rem;
-      margin-bottom: 15px;
+      font-size: 2rem;
+      margin-bottom: 8px;
+      animation: fadeInUp 0.7s forwards;
+      opacity: 0;
     }
-    .btn-group {
+    .subtitle {
+      font-size: 0.95rem;
+      opacity: 0.8;
+      margin-bottom: 20px;
+      animation: fadeInUp 1s forwards;
+      opacity: 0;
+      animation-delay: 0.2s;
+    }
+    @keyframes fadeInUp {
+      0%   { transform: translateY(15px); opacity: 0; }
+      100% { transform: translateY(0);    opacity: 1; }
+    }
+
+    .welcome-buttons {
       display: flex;
       flex-direction: column;
       gap: 10px;
       margin-bottom: 20px;
+      animation: fadeInUp 1.2s forwards;
+      opacity: 0;
+      animation-delay: 0.4s;
     }
-    .ios-btn {
-      background-color: rgba(255,255,255,0.2);
+    .welcome-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.2);
       color: #fff;
       border: none;
       border-radius: 10px;
       padding: 12px 20px;
       font-size: 1rem;
       cursor: pointer;
-      text-align: center;
       transition: background-color 0.2s, transform 0.2s;
     }
-    .ios-btn:hover {
+    .welcome-btn:hover {
       background-color: rgba(255,255,255,0.3);
       transform: scale(1.03);
     }
+
     /* Кнопка Run */
     .run-btn {
       background-color: #fff;
-      color: #ff0000;
-      border: none;
-      border-radius: 10px;
-      padding: 12px 20px;
-      font-size: 1rem;
+      color: #3b0cbd; /* фиолетовый */
       font-weight: bold;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
     }
     .run-btn:hover {
-      transform: scale(1.03);
-      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.3);
     }
 
-    /* ---------- Модальные окна (Settings, Credits) ---------- */
+    /****************************************
+     *        МОДАЛЬНЫЕ ОКНА (SETTINGS)     *
+     ****************************************/
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.5);
-      display: none; /* скрыто по умолчанию */
+      display: none; /* скрыто изначально */
       align-items: center;
       justify-content: center;
-      z-index: 1000;
+      z-index: 2000;
     }
     .modal {
       background: #fff;
@@ -110,10 +159,10 @@
       max-width: 300px;
       text-align: center;
       animation: fadeIn 0.3s forwards;
+      color: #333;
     }
     .modal h2 {
       margin-bottom: 15px;
-      font-size: 1.3rem;
     }
     .modal button {
       margin-top: 15px;
@@ -121,83 +170,91 @@
       border-radius: 8px;
       border: none;
       cursor: pointer;
-      background-color: #007aff;
+      background-color: #3b0cbd;
       color: #fff;
       font-size: 1rem;
     }
-    .close-area {
-      margin-top: 10px;
-    }
 
-    /* ---------- Плавающее меню с вкладками ---------- */
-    #floatingMenu {
+    /****************************************
+     *       ДВУХКОЛОНОЧНОЕ МЕНЮ (FxL Style) *
+     ****************************************/
+    #cheatMenu {
       position: fixed;
-      top: 50px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 320px;
-      height: 420px;
-      background-color: rgba(0, 0, 0, 0.85);
+      inset: 0;
+      background: #151515; /* тёмный фон */
+      display: none;       /* скрыто изначально */
+      z-index: 3000;
+    }
+    .menu-container {
+      display: flex;
+      width: 100%;
+      height: 100%;
+    }
+    /* Левая панель (вкладки) */
+    .menu-sidebar {
+      width: 200px;
+      background: #1e1e1e;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      border-right: 2px solid #333;
+    }
+    .menu-title {
       color: #fff;
-      border-radius: 20px;
-      display: none;
-      z-index: 2000;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-      animation: slideUp 0.5s forwards;
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 1.2rem;
+      font-weight: bold;
     }
-    @keyframes slideUp {
-      from { opacity: 0; transform: translate(-50%, 50px); }
-      to   { opacity: 1; transform: translate(-50%, 0); }
-    }
-
-    /* Заголовок меню или «шапка» для перетаскивания */
-    .menu-header {
+    .tab-btn {
+      background: #2b2b2b;
+      color: #fff;
+      border: 1px solid #333;
+      border-radius: 8px;
       padding: 10px;
       text-align: center;
-      font-size: 1rem;
-      border-bottom: 1px solid rgba(255,255,255,0.2);
-      cursor: move; /* курсор перемещения */
-    }
-
-    /* Панель вкладок */
-    .tab-bar {
-      display: flex;
-      justify-content: space-around;
-      border-bottom: 1px solid rgba(255,255,255,0.2);
-    }
-    .tab {
-      flex: 1;
-      text-align: center;
-      padding: 10px 0;
       cursor: pointer;
+      transition: background 0.2s;
       font-size: 0.95rem;
     }
-    .tab.active {
-      background-color: rgba(255,255,255,0.2);
+    .tab-btn:hover {
+      background: #3b0cbd;
+    }
+    .tab-btn.active {
+      background: #3b0cbd;
     }
 
-    /* Содержимое вкладок */
+    /* Правая панель (контент) */
+    .menu-content {
+      flex: 1;
+      padding: 20px;
+      color: #fff;
+    }
     .tab-content {
       display: none;
-      padding: 15px;
-      overflow-y: auto;
-      height: calc(100% - 90px); 
     }
     .tab-content.active {
       display: block;
     }
+
+    /* Пример стилей для переключателей, селектов, слайдеров */
     .option-block {
       margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
     .option-block label {
-      display: inline-block;
-      margin-left: 8px;
-      vertical-align: middle;
+      min-width: 70px;
     }
-    .option-block .subtitle {
-      font-size: 0.8rem;
-      color: #f99;
-      margin-top: 5px;
+    .option-block select,
+    .option-block input[type="range"] {
+      flex: 1;
+    }
+    .warning-text {
+      color: #f55;
+      font-size: 0.9rem;
     }
 
     /* iOS‑подобный переключатель */
@@ -206,6 +263,7 @@
       display: inline-block;
       width: 48px;
       height: 28px;
+      vertical-align: middle;
     }
     .toggle-switch input {
       display: none;
@@ -230,227 +288,257 @@
       border-radius: 50%;
     }
     input:checked + .slider {
-      background-color: #007aff;
+      background-color: #3b0cbd;
     }
     input:checked + .slider:before {
       transform: translateX(20px);
     }
 
-    /* Кнопка закрыть меню (необязательно) */
-    .close-menu-btn {
+    /* Кнопка закрыть меню */
+    .close-cheatmenu {
       position: absolute;
-      top: 5px;
+      top: 10px;
       right: 10px;
-      background: none;
+      background: #3b0cbd;
       border: none;
-      font-size: 1.2rem;
       color: #fff;
-      cursor: pointer;
-    }
-
-    /* Overlay для "блокировки скриншота" (демо) */
-    #screenshotOverlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: #fff;
-      z-index: 9999;
-    }
-
-    /* Пример стилей для color input */
-    .color-inputs {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      align-items: flex-start;
-    }
-    .color-inputs label {
-      font-size: 0.9rem;
-      margin-bottom: 2px;
-    }
-    .apply-colors-btn {
-      margin-top: 10px;
-      background-color: #ff2d55;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 8px 15px;
+      border-radius: 6px;
+      padding: 8px 12px;
       cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <!-- Белый оверлей для "Overlay Mode" (фейковая блокировка скриншота) -->
-  <div id="screenshotOverlay"></div>
 
-  <!-- Главный экран -->
-  <div id="mainScreen">
-    <img src="/icon-192.png" class="app-icon" alt="App Icon" />
-    <div class="main-title">qweek standoff 2</div>
+  <!-- Контейнер для снежинок -->
+  <div id="snowContainer"></div>
 
-    <div class="btn-group">
-      <button id="openSettingsBtn" class="ios-btn">Settings</button>
-      <button id="openCreditsBtn" class="ios-btn">Credits</button>
+  <!-- ЭКРАН ПРИВЕТСТВИЯ -->
+  <div id="welcomeScreen">
+    <img src="https://i.ibb.co/S7MgQ1Q4/icon-512.jpg" alt="App Icon" class="app-icon" />
+    <div class="main-title">Uicache</div>
+    <div class="subtitle">t.me/uicacheDev | TrollStore</div>
+
+    <div class="welcome-buttons">
+      <!-- Кнопка Settings с иконкой -->
+      <button id="openSettingsBtn" class="welcome-btn">
+        <img src="https://img.icons8.com/m_rounded/512/FFFFFF/settings.png" alt="Settings" width="20" height="20"/>
+        Settings
+      </button>
+
+      <!-- Кнопка Credits с иконкой -->
+      <button id="openCreditsBtn" class="welcome-btn">
+        <img src="https://images.icon-icons.com/510/PNG/512/at_icon-icons.com_50456.png" alt="Credits" width="20" height="20"/>
+        Credits
+      </button>
     </div>
 
-    <button id="runBtn" class="run-btn">Run</button>
+    <!-- Кнопка RUN -->
+    <button id="runBtn" class="welcome-btn run-btn">Run</button>
   </div>
 
-  <!-- Модальное окно Settings (выбор User/Kernel) -->
+  <!-- Модалка SETTINGS (User/Kernel) -->
   <div id="settingsModal" class="modal-overlay">
     <div class="modal">
       <h2>Choose Mode</h2>
-      <div>
-        <label>
-          <input type="radio" name="mode" value="User" checked /> User
-        </label>
-        <label style="margin-left: 15px;">
-          <input type="radio" name="mode" value="Kernel" /> Kernel
-        </label>
-      </div>
+      <label>
+        <input type="radio" name="mode" value="User" checked/>
+        User
+      </label>
+      <label style="margin-left:15px;">
+        <input type="radio" name="mode" value="Kernel"/>
+        Kernel
+      </label>
       <button id="saveSettingsBtn">Save</button>
-      <div class="close-area">
-        <button id="closeSettingsModal" style="margin-top:10px;background:#ccc;color:#000;">Close</button>
-      </div>
+      <br><br>
+      <button id="closeSettingsModal" style="background:#ccc;color:#000;">Close</button>
     </div>
   </div>
 
-  <!-- Модальное окно Credits -->
+  <!-- Модалка CREDITS -->
   <div id="creditsModal" class="modal-overlay">
     <div class="modal">
       <h2>TrollStore Credits</h2>
-      <p style="margin-bottom:10px;">
-        This is a demo TrollStore UI<br/>
-        Created by Qweek<br/>
-        For Standoff 2 experiments
-      </p>
+      <p>Created by Qweek<br/>For Standoff 2 experiments</p>
       <button id="closeCreditsModal" style="background:#ccc;color:#000;">Close</button>
     </div>
   </div>
 
-  <!-- Плавающее меню с вкладками -->
-  <div id="floatingMenu">
-    <button class="close-menu-btn" id="closeMenuBtn">×</button>
-    <div class="menu-header">qweek standoff 2</div>
+  <!-- ОСНОВНОЕ ДВУХКОЛОНОЧНОЕ МЕНЮ (FxL Style) -->
+  <div id="cheatMenu">
+    <button class="close-cheatmenu" id="closeCheatMenuBtn">Close</button>
+    <div class="menu-container">
+      <!-- Левая панель (список вкладок) -->
+      <div class="menu-sidebar">
+        <div class="menu-title">Uicache S2</div>
+        <div class="tab-btn active" data-tab="aimbotTab">Aimbot</div>
+        <div class="tab-btn" data-tab="visualsTab">Visuals</div>
+        <div class="tab-btn" data-tab="skinchTab">Skinchanger</div>
+        <div class="tab-btn" data-tab="miscTab">Misc</div>
+        <div class="tab-btn" data-tab="settingsTab">Settings</div>
+      </div>
 
-    <!-- Вкладки -->
-    <div class="tab-bar">
-      <div class="tab active" data-tab="espTab">ESP</div>
-      <div class="tab" data-tab="aimTab">Aim</div>
-      <div class="tab" data-tab="miscTab">Misc</div>
-      <div class="tab" data-tab="settingsTab">Settings</div>
-    </div>
+      <!-- Правая панель (контент) -->
+      <div class="menu-content">
+        <!-- Aimbot Tab -->
+        <div id="aimbotTab" class="tab-content active">
+          <h2>Aimbot</h2>
+          <div class="option-block">
+            <label>Aim:</label>
+            <label class="toggle-switch">
+              <input type="checkbox" />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="option-block">
+            <label>Head:</label>
+            <select>
+              <option>Head</option>
+              <option>Body</option>
+              <option>Legs</option>
+            </select>
+          </div>
+          <div class="option-block">
+            <label>Firecheck:</label>
+            <label class="toggle-switch">
+              <input type="checkbox" />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="option-block">
+            <label>Fov:</label>
+            <input type="range" min="0" max="180" value="0"/>
+          </div>
+          <div class="option-block">
+            <label>Smooth:</label>
+            <input type="range" min="0" max="10" step="0.1" value="0"/>
+          </div>
+          <div class="warning-text">Warning: ban risk</div>
+        </div>
 
-    <!-- Содержимое вкладок -->
-    <div id="espTab" class="tab-content active">
-      <div class="option-block">
-        <label>Box</label>
-        <label class="toggle-switch">
-          <input type="checkbox" />
-          <span class="slider"></span>
-        </label>
-      </div>
-      <div class="option-block">
-        <label>HP</label>
-        <label class="toggle-switch">
-          <input type="checkbox" />
-          <span class="slider"></span>
-        </label>
-      </div>
-      <div class="option-block">
-        <label>Circle</label>
-        <label class="toggle-switch">
-          <input type="checkbox" />
-          <span class="slider"></span>
-        </label>
-      </div>
-    </div>
+        <!-- Visuals Tab -->
+        <div id="visualsTab" class="tab-content">
+          <h2>Visuals</h2>
+          <div class="option-block">
+            <label>Box:</label>
+            <label class="toggle-switch">
+              <input type="checkbox" />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="option-block">
+            <label>HP:</label>
+            <label class="toggle-switch">
+              <input type="checkbox" />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="option-block">
+            <label>Circle:</label>
+            <label class="toggle-switch">
+              <input type="checkbox" />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
 
-    <div id="aimTab" class="tab-content">
-      <div class="option-block">
-        <label>Aim</label>
-        <label class="toggle-switch">
-          <input type="checkbox" />
-          <span class="slider"></span>
-        </label>
-      </div>
-      <div class="option-block">
-        <label>Smooth</label>
-        <label class="toggle-switch">
-          <input type="checkbox" />
-          <span class="slider"></span>
-        </label>
-      </div>
-      <div class="option-block">
-        <div class="subtitle">Warning: ban risk</div>
-      </div>
-    </div>
+        <!-- Skinchanger Tab -->
+        <div id="skinchTab" class="tab-content">
+          <h2>Skinchanger</h2>
+          <p>Здесь можно выбрать скины для оружия (пример).</p>
+        </div>
 
-    <div id="miscTab" class="tab-content">
-      <div class="option-block">
-        <label>Overlay Mode</label>
-        <label class="toggle-switch">
-          <input type="checkbox" id="overlayModeToggle" />
-          <span class="slider"></span>
-        </label>
-        <div class="subtitle">
-          (Demo — real screenshot blocking is not possible)
+        <!-- Misc Tab -->
+        <div id="miscTab" class="tab-content">
+          <h2>Misc</h2>
+          <div class="option-block">
+            <label>Overlay Mode:</label>
+            <label class="toggle-switch">
+              <input type="checkbox" id="overlayToggle" />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <small>(Demo — реальной блокировки скриншотов нет)</small>
+        </div>
+
+        <!-- Settings Tab -->
+        <div id="settingsTab" class="tab-content">
+          <h2>Settings</h2>
+          <p>Выбор режима (User/Kernel), цвета, прочие настройки —<br/> можно объединить с модальным окном.</p>
         </div>
       </div>
     </div>
+  </div>
 
-    <div id="settingsTab" class="tab-content">
-      <div class="color-inputs">
-        <label for="bgColorPicker">Menu Background</label>
-        <input type="color" id="bgColorPicker" value="#000000" />
-        <label for="textColorPicker">Menu Text</label>
-        <input type="color" id="textColorPicker" value="#ffffff" />
-      </div>
-      <button class="apply-colors-btn" id="applyColorsBtn">Apply</button>
-    </div>
+  <!-- Белый оверлей для "Overlay Mode" (демо) -->
+  <div id="overlayBlock" style="
+    display:none;
+    position: fixed;
+    inset: 0;
+    background: #fff;
+    z-index: 9999;">
   </div>
 
   <script>
-    /* ---------- Ссылки на элементы ---------- */
-    const mainScreen       = document.getElementById('mainScreen');
-    const runBtn           = document.getElementById('runBtn');
-    const floatingMenu     = document.getElementById('floatingMenu');
-    const closeMenuBtn     = document.getElementById('closeMenuBtn');
+    /* -----------------------------
+       СНЕЖИНКИ (ГЕНЕРАЦИЯ JS)
+    ----------------------------- */
+    const snowContainer = document.getElementById('snowContainer');
+    const SNOW_COUNT = 25; // кол-во снежинок
+    for(let i = 0; i < SNOW_COUNT; i++) {
+      const snow = document.createElement('div');
+      snow.className = 'snow';
+      // случайное положение по X
+      snow.style.left = Math.random() * 100 + '%';
+      // случайная задержка анимации и скорость
+      const duration = 5 + Math.random() * 5; // 5-10s
+      const delay = Math.random() * 5;        // 0-5s
+      snow.style.animationDuration = duration + 's';
+      snow.style.animationDelay = delay + 's';
+      snowContainer.appendChild(snow);
+    }
 
-    // Модалки: Settings, Credits
-    const openSettingsBtn   = document.getElementById('openSettingsBtn');
-    const settingsModal     = document.getElementById('settingsModal');
-    const closeSettingsModal= document.getElementById('closeSettingsModal');
-    const saveSettingsBtn   = document.getElementById('saveSettingsBtn');
+    /* -----------------------------
+       ПЕРЕМЕННЫЕ ЭЛЕМЕНТОВ
+    ----------------------------- */
+    const welcomeScreen   = document.getElementById('welcomeScreen');
+    const runBtn          = document.getElementById('runBtn');
+    const cheatMenu       = document.getElementById('cheatMenu');
+    const closeCheatMenuBtn = document.getElementById('closeCheatMenuBtn');
 
-    const openCreditsBtn    = document.getElementById('openCreditsBtn');
-    const creditsModal      = document.getElementById('creditsModal');
-    const closeCreditsModal = document.getElementById('closeCreditsModal');
+    // Модалки Settings / Credits
+    const openSettingsBtn     = document.getElementById('openSettingsBtn');
+    const settingsModal       = document.getElementById('settingsModal');
+    const closeSettingsModal  = document.getElementById('closeSettingsModal');
+    const saveSettingsBtn     = document.getElementById('saveSettingsBtn');
+
+    const openCreditsBtn      = document.getElementById('openCreditsBtn');
+    const creditsModal        = document.getElementById('creditsModal');
+    const closeCreditsModal   = document.getElementById('closeCreditsModal');
 
     // Вкладки
-    const tabs = document.querySelectorAll('.tab');
-    const tabContents = document.querySelectorAll('.tab-content');
+    const tabButtons   = document.querySelectorAll('.tab-btn');
+    const tabContents  = document.querySelectorAll('.tab-content');
 
-    // Overlay Mode (белый экран)
-    const overlayModeToggle = document.getElementById('overlayModeToggle');
-    const screenshotOverlay = document.getElementById('screenshotOverlay');
+    // Overlay Mode
+    const overlayToggle = document.getElementById('overlayToggle');
+    const overlayBlock  = document.getElementById('overlayBlock');
 
-    // Color pickers
-    const bgColorPicker    = document.getElementById('bgColorPicker');
-    const textColorPicker  = document.getElementById('textColorPicker');
-    const applyColorsBtn   = document.getElementById('applyColorsBtn');
-
-    /* ---------- Логика главного экрана ---------- */
+    /* -----------------------------
+       ЛОГИКА ГЛАВНОГО ЭКРАНА
+    ----------------------------- */
     runBtn.addEventListener('click', () => {
-      // Анимированно скрываем главный экран
-      mainScreen.classList.add('hide');
+      // Прячем welcomeScreen
+      welcomeScreen.classList.add('hide');
       setTimeout(() => {
-        mainScreen.style.display = 'none';
-        floatingMenu.style.display = 'block';
-      }, 500);
+        welcomeScreen.style.display = 'none';
+        cheatMenu.style.display = 'block';
+      }, 600);
     });
 
-    /* ---------- Модалка Settings (User/Kernel) ---------- */
+    /* -----------------------------
+       МОДАЛКИ SETTINGS / CREDITS
+    ----------------------------- */
     openSettingsBtn.addEventListener('click', () => {
       settingsModal.style.display = 'flex';
     });
@@ -458,14 +546,12 @@
       settingsModal.style.display = 'none';
     });
     saveSettingsBtn.addEventListener('click', () => {
-      // Сохраняем выбор (просто для примера, можно хранить в localStorage)
+      // Получаем выбранное значение (User/Kernel)
       const mode = document.querySelector('input[name="mode"]:checked').value;
       console.log('Selected mode:', mode);
-      // Закрываем окно
       settingsModal.style.display = 'none';
     });
 
-    /* ---------- Модалка Credits ---------- */
     openCreditsBtn.addEventListener('click', () => {
       creditsModal.style.display = 'flex';
     });
@@ -473,80 +559,42 @@
       creditsModal.style.display = 'none';
     });
 
-    /* ---------- Вкладки в плавающем меню ---------- */
-    tabs.forEach((tab) => {
-      tab.addEventListener('click', () => {
-        // Удаляем active со всех вкладок
-        tabs.forEach((t) => t.classList.remove('active'));
-        tab.classList.add('active');
+    /* -----------------------------
+       ВКЛАДКИ В МЕНЮ
+    ----------------------------- */
+    tabButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        // снимаем active со всех
+        tabButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
 
-        // Прячем все tab-content
-        tabContents.forEach((content) => {
-          content.classList.remove('active');
-        });
-
-        // Показываем нужный блок
-        const tabId = tab.getAttribute('data-tab');
-        document.getElementById(tabId).classList.add('active');
+        // прячем все tab-content
+        tabContents.forEach(tc => tc.classList.remove('active'));
+        // показываем нужный
+        const target = btn.getAttribute('data-tab');
+        document.getElementById(target).classList.add('active');
       });
     });
 
-    /* ---------- Кнопка закрыть плавающее меню ---------- */
-    closeMenuBtn.addEventListener('click', () => {
-      floatingMenu.style.display = 'none';
-      // Возвращаем главный экран
-      mainScreen.classList.remove('hide');
-      mainScreen.style.display = 'flex';
+    /* -----------------------------
+       КНОПКА ЗАКРЫТЬ МЕНЮ
+    ----------------------------- */
+    closeCheatMenuBtn.addEventListener('click', () => {
+      cheatMenu.style.display = 'none';
+      // Возвращаем welcomeScreen (если нужно)
+      welcomeScreen.classList.remove('hide');
+      welcomeScreen.style.display = 'flex';
     });
 
-    /* ---------- Перетаскивание плавающего меню (drag) ---------- */
-    let isDown = false, offsetX = 0, offsetY = 0;
-    const menuHeader = document.querySelector('.menu-header');
-
-    menuHeader.addEventListener('mousedown', (e) => {
-      isDown = true;
-      offsetX = e.offsetX;
-      offsetY = e.offsetY;
-    });
-    document.addEventListener('mousemove', (e) => {
-      if (!isDown) return;
-      floatingMenu.style.left = (e.clientX - offsetX) + 'px';
-      floatingMenu.style.top  = (e.clientY - offsetY) + 'px';
-    });
-    document.addEventListener('mouseup', () => {
-      isDown = false;
-    });
-
-    // Для мобильных
-    menuHeader.addEventListener('touchstart', (e) => {
-      isDown = true;
-      offsetX = e.touches[0].clientX - floatingMenu.offsetLeft;
-      offsetY = e.touches[0].clientY - floatingMenu.offsetTop;
-    });
-    document.addEventListener('touchmove', (e) => {
-      if (!isDown) return;
-      floatingMenu.style.left = (e.touches[0].clientX - offsetX) + 'px';
-      floatingMenu.style.top  = (e.touches[0].clientY - offsetY) + 'px';
-    });
-    document.addEventListener('touchend', () => {
-      isDown = false;
-    });
-
-    /* ---------- Overlay Mode (фейк-блокировка скриншотов) ---------- */
-    overlayModeToggle.addEventListener('change', (e) => {
-      if (e.target.checked) {
-        screenshotOverlay.style.display = 'block';
+    /* -----------------------------
+       OVERLAY MODE (фейк-блокировка)
+    ----------------------------- */
+    overlayToggle.addEventListener('change', (e) => {
+      if(e.target.checked) {
+        overlayBlock.style.display = 'block';
       } else {
-        screenshotOverlay.style.display = 'none';
+        overlayBlock.style.display = 'none';
       }
-    });
-
-    /* ---------- Применение цвета меню (Settings вкладка) ---------- */
-    applyColorsBtn.addEventListener('click', () => {
-      const bgColor   = bgColorPicker.value;
-      const textColor = textColorPicker.value;
-      floatingMenu.style.backgroundColor = bgColor;
-      floatingMenu.style.color           = textColor;
     });
   </script>
 </body>
