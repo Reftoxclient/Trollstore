@@ -2,397 +2,203 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Uicache - TrollStore</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>oeral standoff 2</title>
 
-  <!-- Мета-теги для PWA, если нужно -->
-  <!-- <link rel="manifest" href="manifest.json"> -->
+  <!-- Тема для PWA -->
+  <meta name="theme-color" content="#3b0cbd" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
+  <!-- Стили приложения -->
   <style>
-    * {
-      margin: 0; 
-      padding: 0; 
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background: #000;
-      overflow: hidden; /* убираем прокрутку, если хотите */
-    }
-
-    /****************************************
-     *   ЭКРАН ПРИВЕТСТВИЯ (GLASS/GRADIENT)  *
-     ****************************************/
-    #welcomeScreen {
-      position: fixed;
-      inset: 0; /* top:0; right:0; bottom:0; left:0; */
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(180deg, #1d006e, #000000 80%);
-      color: #fff;
-      animation: fadeIn 0.8s forwards;
-      z-index: 1000;
-    }
-    @keyframes fadeIn {
-      0%   { opacity: 0; }
-      100% { opacity: 1; }
-    }
-    @keyframes fadeOut {
-      0%   { opacity: 1; }
-      100% { opacity: 0; }
-    }
-    .hide {
-      animation: fadeOut 0.6s forwards;
-    }
-
-    /* Анимация «снежинок» (snomations) */
-    #snowContainer {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      pointer-events: none;
       overflow: hidden;
     }
-    .snow {
-      position: absolute;
-      top: -10px;
-      width: 10px;
-      height: 10px;
-      background: radial-gradient(#fff, rgba(255,255,255,0.2));
-      border-radius: 50%;
-      animation-name: fall;
-      animation-timing-function: linear;
-    }
-    @keyframes fall {
-      to {
-        transform: translateY(120vh);
-      }
-    }
-
-    .app-icon {
-      width: 100px;
-      height: 100px;
-      border-radius: 20px;
-      margin-bottom: 20px;
-      animation: scaleUp 0.7s ease forwards;
-      opacity: 0;
-    }
-    @keyframes scaleUp {
-      0%   { transform: scale(0.6); opacity: 0; }
-      100% { transform: scale(1);   opacity: 1; }
-    }
-    .main-title {
-      font-size: 2rem;
-      margin-bottom: 8px;
-      animation: fadeInUp 0.7s forwards;
-      opacity: 0;
-    }
-    .subtitle {
-      font-size: 0.95rem;
-      opacity: 0.8;
-      margin-bottom: 20px;
-      animation: fadeInUp 1s forwards;
-      opacity: 0;
-      animation-delay: 0.2s;
-    }
-    @keyframes fadeInUp {
-      0%   { transform: translateY(15px); opacity: 0; }
-      100% { transform: translateY(0);    opacity: 1; }
-    }
-
-    .welcome-buttons {
+    /* ***************** WELCOME SCREEN ***************** */
+    #welcomeScreen {
+      position: fixed; inset: 0;
+      background: linear-gradient(to bottom, #070016, #000000 80%);
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      margin-bottom: 20px;
-      animation: fadeInUp 1.2s forwards;
-      opacity: 0;
-      animation-delay: 0.4s;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      z-index: 1000;
+      animation: fadeIn 0.8s forwards;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+    .hide { animation: fadeOut 0.6s forwards; }
+    .app-icon {
+      width: 100px; height: 100px; border-radius: 15px; margin-bottom: 20px;
+    }
+    .main-title { font-size: 2rem; margin-bottom: 5px; }
+    .subtitle { font-size: 0.95rem; opacity: 0.8; margin-bottom: 20px; }
+    .welcome-buttons {
+      display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;
     }
     .welcome-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      background: rgba(255,255,255,0.2);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      padding: 12px 20px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background-color 0.2s, transform 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      background: rgba(255,255,255,0.2); color: #fff; border: none;
+      border-radius: 10px; padding: 12px 20px; font-size: 1rem; cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
     }
-    .welcome-btn:hover {
-      background-color: rgba(255,255,255,0.3);
-      transform: scale(1.03);
-    }
-
-    /* Кнопка Run */
-    .run-btn {
-      background-color: #fff;
-      color: #3b0cbd; /* фиолетовый */
-      font-weight: bold;
-    }
-    .run-btn:hover {
-      box-shadow: 0 3px 8px rgba(0,0,0,0.3);
-    }
-
-    /****************************************
-     *        МОДАЛЬНЫЕ ОКНА (SETTINGS)     *
-     ****************************************/
+    .welcome-btn:hover { background: rgba(255,255,255,0.3); transform: scale(1.03); }
+    .run-btn { background-color: #fff; color: #3b0cbd; font-weight: bold; }
+    .run-btn:hover { box-shadow: 0 3px 8px rgba(0,0,0,0.3); }
+    /* ***************** MODAL ОКНА ***************** */
     .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.5);
-      display: none; /* скрыто изначально */
-      align-items: center;
-      justify-content: center;
-      z-index: 2000;
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5); display: none;
+      align-items: center; justify-content: center; z-index: 2000;
     }
     .modal {
-      background: #fff;
-      border-radius: 15px;
-      padding: 20px;
-      width: 80%;
-      max-width: 300px;
-      text-align: center;
+      background: #fff; border-radius: 15px; padding: 20px;
+      width: 80%; max-width: 320px; text-align: center; color: #333;
       animation: fadeIn 0.3s forwards;
-      color: #333;
     }
-    .modal h2 {
-      margin-bottom: 15px;
-    }
+    .modal h2 { margin-bottom: 15px; }
     .modal button {
-      margin-top: 15px;
-      padding: 10px 20px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      background-color: #3b0cbd;
-      color: #fff;
-      font-size: 1rem;
+      margin-top: 15px; padding: 10px 20px; border-radius: 8px; border: none;
+      cursor: pointer; background-color: #3b0cbd; color: #fff; font-size: 1rem;
     }
-
-    /****************************************
-     *       ДВУХКОЛОНОЧНОЕ МЕНЮ (FxL Style) *
-     ****************************************/
+    /* ***************** CHEAT MENU (ДВУХКОЛОНОЧНОЕ) ***************** */
     #cheatMenu {
-      position: fixed;
-      inset: 0;
-      background: #151515; /* тёмный фон */
-      display: none;       /* скрыто изначально */
-      z-index: 3000;
+      position: fixed; inset: 0; display: none;
+      background: #000; z-index: 3000; animation: fadeIn 0.6s forwards;
     }
-    .menu-container {
-      display: flex;
-      width: 100%;
-      height: 100%;
+    .close-cheatmenu {
+      position: absolute; top: 10px; right: 10px;
+      background: #3b0cbd; border: none; color: #fff; border-radius: 6px;
+      padding: 8px 12px; cursor: pointer; z-index: 3100;
     }
-    /* Левая панель (вкладки) */
+    .menu-container { display: flex; width: 100%; height: 100%; }
     .menu-sidebar {
-      width: 200px;
-      background: #1e1e1e;
-      padding: 15px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+      width: 200px; background: #1e1e1e; padding: 15px;
+      display: flex; flex-direction: column; align-items: stretch;
       border-right: 2px solid #333;
     }
     .menu-title {
-      color: #fff;
-      text-align: center;
-      margin-bottom: 10px;
-      font-size: 1.2rem;
-      font-weight: bold;
+      color: #fff; text-align: center; margin-bottom: 15px;
+      font-size: 1.1rem; font-weight: bold;
     }
-    .tab-btn {
-      background: #2b2b2b;
-      color: #fff;
-      border: 1px solid #333;
-      border-radius: 8px;
-      padding: 10px;
-      text-align: center;
-      cursor: pointer;
-      transition: background 0.2s;
-      font-size: 0.95rem;
+    .sidebar-button {
+      background: #2b2b2b; color: #fff; border: 1px solid #3b0cbd;
+      border-radius: 4px; padding: 10px; margin-bottom: 10px; text-align: center;
+      font-size: 1rem; cursor: pointer; transition: background 0.2s;
     }
-    .tab-btn:hover {
-      background: #3b0cbd;
-    }
-    .tab-btn.active {
-      background: #3b0cbd;
-    }
-
-    /* Правая панель (контент) */
+    .sidebar-button:hover, .sidebar-button.active { background: #3b0cbd; }
     .menu-content {
-      flex: 1;
-      padding: 20px;
-      color: #fff;
+      flex: 1; padding: 20px; color: #fff; background: #151515;
+      display: flex; flex-direction: column;
     }
-    .tab-content {
-      display: none;
+    .content-title {
+      font-size: 1.3rem; margin-bottom: 10px;
+      border-bottom: 1px solid #333; padding-bottom: 5px;
     }
-    .tab-content.active {
-      display: block;
-    }
-
-    /* Пример стилей для переключателей, селектов, слайдеров */
+    .tab-content { display: none; flex: 1; overflow-y: auto; margin-top: 10px; }
+    .tab-content.active { display: block; }
     .option-block {
-      margin-bottom: 15px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      display: flex; align-items: center; margin-bottom: 15px;
     }
-    .option-block label {
-      min-width: 70px;
-    }
-    .option-block select,
-    .option-block input[type="range"] {
-      flex: 1;
-    }
-    .warning-text {
-      color: #f55;
-      font-size: 0.9rem;
-    }
-
-    /* iOS‑подобный переключатель */
+    .option-block label { margin-right: 10px; }
+    .warning-text { color: #f55; font-size: 0.9rem; }
+    /* ***************** TOGGLE SWITCH ***************** */
     .toggle-switch {
-      position: relative;
-      display: inline-block;
-      width: 48px;
-      height: 28px;
-      vertical-align: middle;
+      position: relative; display: inline-block; width: 48px; height: 28px;
     }
-    .toggle-switch input {
-      display: none;
-    }
+    .toggle-switch input { display: none; }
     .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: #ccc;
-      transition: .4s;
-      border-radius: 34px;
+      position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #ccc; transition: 0.4s; border-radius: 34px;
     }
     .slider:before {
-      position: absolute;
-      content: "";
-      height: 22px;
-      width: 22px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      transition: .4s;
-      border-radius: 50%;
+      position: absolute; content: "";
+      height: 22px; width: 22px; left: 3px; bottom: 3px;
+      background-color: #fff; transition: 0.4s; border-radius: 50%;
     }
-    input:checked + .slider {
-      background-color: #3b0cbd;
-    }
-    input:checked + .slider:before {
-      transform: translateX(20px);
-    }
-
-    /* Кнопка закрыть меню */
-    .close-cheatmenu {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: #3b0cbd;
-      border: none;
-      color: #fff;
-      border-radius: 6px;
-      padding: 8px 12px;
-      cursor: pointer;
+    input:checked + .slider { background-color: #3b0cbd; }
+    input:checked + .slider:before { transform: translateX(20px); }
+    /* ***************** OVERLAY MODE ***************** */
+    #overlayBlock {
+      display: none; position: fixed; inset: 0; background: #fff; z-index: 9999;
     }
   </style>
 </head>
 <body>
-
-  <!-- Контейнер для снежинок -->
-  <div id="snowContainer"></div>
-
-  <!-- ЭКРАН ПРИВЕТСТВИЯ -->
+  <!-- WELCOME SCREEN -->
   <div id="welcomeScreen">
-    <img src="https://i.ibb.co/S7MgQ1Q4/icon-512.jpg" alt="App Icon" class="app-icon" />
-    <div class="main-title">Uicache</div>
-    <div class="subtitle">t.me/uicacheDev | TrollStore</div>
-
+    <img src="https://i.ibb.co/S7MgQ1Q4/icon-512.jpg" class="app-icon" alt="App Icon">
+    <div class="main-title">oeral standoff 2</div>
+    <div class="subtitle">t.me/oeralDev | TrollStore</div>
     <div class="welcome-buttons">
-      <!-- Кнопка Settings с иконкой -->
       <button id="openSettingsBtn" class="welcome-btn">
-        <img src="https://img.icons8.com/m_rounded/512/FFFFFF/settings.png" alt="Settings" width="20" height="20"/>
+        <img src="https://img.icons8.com/m_rounded/512/FFFFFF/settings.png" alt="Settings" width="20" height="20">
         Settings
       </button>
-
-      <!-- Кнопка Credits с иконкой -->
       <button id="openCreditsBtn" class="welcome-btn">
-        <img src="https://images.icon-icons.com/510/PNG/512/at_icon-icons.com_50456.png" alt="Credits" width="20" height="20"/>
+        <img src="https://images.icon-icons.com/510/PNG/512/at_icon-icons.com_50456.png" alt="Credits" width="20" height="20">
         Credits
       </button>
     </div>
-
-    <!-- Кнопка RUN -->
     <button id="runBtn" class="welcome-btn run-btn">Run</button>
   </div>
 
-  <!-- Модалка SETTINGS (User/Kernel) -->
+  <!-- MODAL: SETTINGS -->
   <div id="settingsModal" class="modal-overlay">
     <div class="modal">
       <h2>Choose Mode</h2>
       <label>
-        <input type="radio" name="mode" value="User" checked/>
-        User
+        <input type="radio" name="mode" value="User" checked> User
       </label>
       <label style="margin-left:15px;">
-        <input type="radio" name="mode" value="Kernel"/>
-        Kernel
+        <input type="radio" name="mode" value="Kernel"> Kernel
       </label>
       <button id="saveSettingsBtn">Save</button>
       <br><br>
-      <button id="closeSettingsModal" style="background:#ccc;color:#000;">Close</button>
+      <button id="closeSettingsModal" style="background:#ccc; color:#000;">Close</button>
     </div>
   </div>
 
-  <!-- Модалка CREDITS -->
+  <!-- MODAL: CREDITS -->
   <div id="creditsModal" class="modal-overlay">
     <div class="modal">
       <h2>TrollStore Credits</h2>
-      <p>Created by Qweek<br/>For Standoff 2 experiments</p>
-      <button id="closeCreditsModal" style="background:#ccc;color:#000;">Close</button>
+      <p>Created by Qweek<br>For Standoff 2 experiments</p>
+      <button id="closeCreditsModal" style="background:#ccc; color:#000;">Close</button>
     </div>
   </div>
 
-  <!-- ОСНОВНОЕ ДВУХКОЛОНОЧНОЕ МЕНЮ (FxL Style) -->
+  <!-- CHEAT MENU -->
   <div id="cheatMenu">
     <button class="close-cheatmenu" id="closeCheatMenuBtn">Close</button>
     <div class="menu-container">
-      <!-- Левая панель (список вкладок) -->
       <div class="menu-sidebar">
-        <div class="menu-title">Uicache S2</div>
-        <div class="tab-btn active" data-tab="aimbotTab">Aimbot</div>
-        <div class="tab-btn" data-tab="visualsTab">Visuals</div>
-        <div class="tab-btn" data-tab="skinchTab">Skinchanger</div>
-        <div class="tab-btn" data-tab="miscTab">Misc</div>
-        <div class="tab-btn" data-tab="settingsTab">Settings</div>
+        <div class="menu-title">oeral S2</div>
+        <div class="sidebar-button" data-tab="aimbotTab">Aimbot</div>
+        <div class="sidebar-button" data-tab="visualsTab">Visuals</div>
+        <div class="sidebar-button" data-tab="skinchTab">Skinchanger</div>
+        <div class="sidebar-button" data-tab="miscTab">Misc</div>
+        <div class="sidebar-button" data-tab="settingsTab">Settings</div>
       </div>
-
-      <!-- Правая панель (контент) -->
       <div class="menu-content">
         <!-- Aimbot Tab -->
         <div id="aimbotTab" class="tab-content active">
-          <h2>Aimbot</h2>
+          <div class="content-title">Aimbot</div>
           <div class="option-block">
             <label>Aim:</label>
             <label class="toggle-switch">
-              <input type="checkbox" />
+              <input type="checkbox" id="aimToggle">
               <span class="slider"></span>
             </label>
           </div>
           <div class="option-block">
             <label>Head:</label>
-            <select>
+            <select id="headSelect">
               <option>Head</option>
               <option>Body</option>
               <option>Legs</option>
@@ -401,42 +207,42 @@
           <div class="option-block">
             <label>Firecheck:</label>
             <label class="toggle-switch">
-              <input type="checkbox" />
+              <input type="checkbox" id="firecheckToggle">
               <span class="slider"></span>
             </label>
           </div>
           <div class="option-block">
             <label>Fov:</label>
-            <input type="range" min="0" max="180" value="0"/>
+            <input type="range" min="0" max="180" value="90" id="fovRange">
           </div>
           <div class="option-block">
             <label>Smooth:</label>
-            <input type="range" min="0" max="10" step="0.1" value="0"/>
+            <input type="range" min="0" max="10" step="0.1" value="5" id="smoothRange">
           </div>
           <div class="warning-text">Warning: ban risk</div>
         </div>
 
-        <!-- Visuals Tab -->
+        <!-- Visuals Tab (ESP) -->
         <div id="visualsTab" class="tab-content">
-          <h2>Visuals</h2>
+          <div class="content-title">Visuals (ESP)</div>
           <div class="option-block">
             <label>Box:</label>
             <label class="toggle-switch">
-              <input type="checkbox" />
+              <input type="checkbox" id="espBox">
               <span class="slider"></span>
             </label>
           </div>
           <div class="option-block">
             <label>HP:</label>
             <label class="toggle-switch">
-              <input type="checkbox" />
+              <input type="checkbox" id="espHP">
               <span class="slider"></span>
             </label>
           </div>
           <div class="option-block">
             <label>Circle:</label>
             <label class="toggle-switch">
-              <input type="checkbox" />
+              <input type="checkbox" id="espCircle">
               <span class="slider"></span>
             </label>
           </div>
@@ -444,158 +250,143 @@
 
         <!-- Skinchanger Tab -->
         <div id="skinchTab" class="tab-content">
-          <h2>Skinchanger</h2>
-          <p>Здесь можно выбрать скины для оружия (пример).</p>
+          <div class="content-title">Skinchanger</div>
+          <p>Выберите скин оружия (пример):</p>
+          <!-- Дополнительный функционал можно добавить -->
         </div>
 
         <!-- Misc Tab -->
         <div id="miscTab" class="tab-content">
-          <h2>Misc</h2>
+          <div class="content-title">Misc</div>
           <div class="option-block">
             <label>Overlay Mode:</label>
             <label class="toggle-switch">
-              <input type="checkbox" id="overlayToggle" />
+              <input type="checkbox" id="overlayToggle">
               <span class="slider"></span>
             </label>
           </div>
-          <small>(Demo — реальной блокировки скриншотов нет)</small>
+          <small>(Demo: реальной блокировки скриншотов нет)</small>
         </div>
 
         <!-- Settings Tab -->
         <div id="settingsTab" class="tab-content">
-          <h2>Settings</h2>
-          <p>Выбор режима (User/Kernel), цвета, прочие настройки —<br/> можно объединить с модальным окном.</p>
+          <div class="content-title">Settings</div>
+          <p>Дополнительные настройки...</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Белый оверлей для "Overlay Mode" (демо) -->
-  <div id="overlayBlock" style="
-    display:none;
-    position: fixed;
-    inset: 0;
-    background: #fff;
-    z-index: 9999;">
-  </div>
+  <!-- Overlay для Overlay Mode -->
+  <div id="overlayBlock"></div>
 
+  <!-- ***************** INLINE SCRIPT (Manifest, SW, Логика) ***************** -->
   <script>
-    /* -----------------------------
-       СНЕЖИНКИ (ГЕНЕРАЦИЯ JS)
-    ----------------------------- */
-    const snowContainer = document.getElementById('snowContainer');
-    const SNOW_COUNT = 25; // кол-во снежинок
-    for(let i = 0; i < SNOW_COUNT; i++) {
-      const snow = document.createElement('div');
-      snow.className = 'snow';
-      // случайное положение по X
-      snow.style.left = Math.random() * 100 + '%';
-      // случайная задержка анимации и скорость
-      const duration = 5 + Math.random() * 5; // 5-10s
-      const delay = Math.random() * 5;        // 0-5s
-      snow.style.animationDuration = duration + 's';
-      snow.style.animationDelay = delay + 's';
-      snowContainer.appendChild(snow);
+    // Создание манифеста через Blob
+    (function() {
+      const manifestData = {
+        "name": "oeral standoff 2",
+        "short_name": "oeralS2",
+        "start_url": "./index.html",
+        "display": "standalone",
+        "background_color": "#000000",
+        "theme_color": "#3b0cbd",
+        "icons": [
+          {
+            "src": "https://i.ibb.co/S7MgQ1Q4/icon-512.jpg",
+            "sizes": "512x512",
+            "type": "image/jpg"
+          }
+        ]
+      };
+      const stringManifest = JSON.stringify(manifestData);
+      const blob = new Blob([stringManifest], { type: 'application/json' });
+      const manifestURL = URL.createObjectURL(blob);
+      const manifestLink = document.createElement('link');
+      manifestLink.rel = 'manifest';
+      manifestLink.href = manifestURL;
+      document.head.appendChild(manifestLink);
+    })();
+
+    // Регистрируем Service Worker через Blob
+    if ('serviceWorker' in navigator) {
+      const swCode = `
+        self.addEventListener('install', event => { event.waitUntil(self.skipWaiting()); });
+        self.addEventListener('activate', event => { event.waitUntil(self.clients.claim()); });
+        self.addEventListener('fetch', event => { event.respondWith(fetch(event.request)); });
+      `;
+      const blob = new Blob([swCode], { type: 'application/javascript' });
+      const swUrl = URL.createObjectURL(blob);
+      navigator.serviceWorker.register(swUrl).then(registration => {
+        console.log('Service Worker registered with scope:', registration.scope);
+      }).catch(error => {
+        console.error('Service Worker registration failed:', error);
+      });
     }
 
-    /* -----------------------------
-       ПЕРЕМЕННЫЕ ЭЛЕМЕНТОВ
-    ----------------------------- */
-    const welcomeScreen   = document.getElementById('welcomeScreen');
-    const runBtn          = document.getElementById('runBtn');
-    const cheatMenu       = document.getElementById('cheatMenu');
+    // Логика Welcome Screen и Cheat Menu
+    const welcomeScreen = document.getElementById('welcomeScreen');
+    const runBtn = document.getElementById('runBtn');
+    const cheatMenu = document.getElementById('cheatMenu');
     const closeCheatMenuBtn = document.getElementById('closeCheatMenuBtn');
-
-    // Модалки Settings / Credits
-    const openSettingsBtn     = document.getElementById('openSettingsBtn');
-    const settingsModal       = document.getElementById('settingsModal');
-    const closeSettingsModal  = document.getElementById('closeSettingsModal');
-    const saveSettingsBtn     = document.getElementById('saveSettingsBtn');
-
-    const openCreditsBtn      = document.getElementById('openCreditsBtn');
-    const creditsModal        = document.getElementById('creditsModal');
-    const closeCreditsModal   = document.getElementById('closeCreditsModal');
-
-    // Вкладки
-    const tabButtons   = document.querySelectorAll('.tab-btn');
-    const tabContents  = document.querySelectorAll('.tab-content');
-
-    // Overlay Mode
-    const overlayToggle = document.getElementById('overlayToggle');
-    const overlayBlock  = document.getElementById('overlayBlock');
-
-    /* -----------------------------
-       ЛОГИКА ГЛАВНОГО ЭКРАНА
-    ----------------------------- */
     runBtn.addEventListener('click', () => {
-      // Прячем welcomeScreen
       welcomeScreen.classList.add('hide');
       setTimeout(() => {
         welcomeScreen.style.display = 'none';
         cheatMenu.style.display = 'block';
       }, 600);
     });
-
-    /* -----------------------------
-       МОДАЛКИ SETTINGS / CREDITS
-    ----------------------------- */
-    openSettingsBtn.addEventListener('click', () => {
-      settingsModal.style.display = 'flex';
-    });
-    closeSettingsModal.addEventListener('click', () => {
-      settingsModal.style.display = 'none';
-    });
-    saveSettingsBtn.addEventListener('click', () => {
-      // Получаем выбранное значение (User/Kernel)
-      const mode = document.querySelector('input[name="mode"]:checked').value;
-      console.log('Selected mode:', mode);
-      settingsModal.style.display = 'none';
-    });
-
-    openCreditsBtn.addEventListener('click', () => {
-      creditsModal.style.display = 'flex';
-    });
-    closeCreditsModal.addEventListener('click', () => {
-      creditsModal.style.display = 'none';
-    });
-
-    /* -----------------------------
-       ВКЛАДКИ В МЕНЮ
-    ----------------------------- */
-    tabButtons.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        // снимаем active со всех
-        tabButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-
-        // прячем все tab-content
-        tabContents.forEach(tc => tc.classList.remove('active'));
-        // показываем нужный
-        const target = btn.getAttribute('data-tab');
-        document.getElementById(target).classList.add('active');
-      });
-    });
-
-    /* -----------------------------
-       КНОПКА ЗАКРЫТЬ МЕНЮ
-    ----------------------------- */
     closeCheatMenuBtn.addEventListener('click', () => {
       cheatMenu.style.display = 'none';
-      // Возвращаем welcomeScreen (если нужно)
       welcomeScreen.classList.remove('hide');
       welcomeScreen.style.display = 'flex';
     });
 
-    /* -----------------------------
-       OVERLAY MODE (фейк-блокировка)
-    ----------------------------- */
-    overlayToggle.addEventListener('change', (e) => {
-      if(e.target.checked) {
-        overlayBlock.style.display = 'block';
-      } else {
-        overlayBlock.style.display = 'none';
-      }
+    // Модальные окна: Settings и Credits
+    const openSettingsBtn = document.getElementById('openSettingsBtn');
+    const settingsModal = document.getElementById('settingsModal');
+    const closeSettingsModal = document.getElementById('closeSettingsModal');
+    const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+    openSettingsBtn.addEventListener('click', () => { settingsModal.style.display = 'flex'; });
+    closeSettingsModal.addEventListener('click', () => { settingsModal.style.display = 'none'; });
+    saveSettingsBtn.addEventListener('click', () => {
+      const mode = document.querySelector('input[name="mode"]:checked').value;
+      console.log('Selected mode:', mode);
+      settingsModal.style.display = 'none';
     });
+    const openCreditsBtn = document.getElementById('openCreditsBtn');
+    const creditsModal = document.getElementById('creditsModal');
+    const closeCreditsModal = document.getElementById('closeCreditsModal');
+    openCreditsBtn.addEventListener('click', () => { creditsModal.style.display = 'flex'; });
+    closeCreditsModal.addEventListener('click', () => { creditsModal.style.display = 'none'; });
+
+    // Переключение вкладок в меню
+    const sidebarButtons = document.querySelectorAll('.sidebar-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+    sidebarButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        sidebarButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const target = btn.getAttribute('data-tab');
+        tabContents.forEach(tc => { tc.classList.remove('active'); });
+        document.getElementById(target).classList.add('active');
+      });
+    });
+
+    // Overlay Mode (демо)
+    const overlayToggle = document.getElementById('overlayToggle');
+    const overlayBlock = document.getElementById('overlayBlock');
+    overlayToggle.addEventListener('change', e => {
+      overlayBlock.style.display = e.target.checked ? 'block' : 'none';
+    });
+
+    // Функции для ESP (Visuals) – вывод в консоль при изменении переключателей
+    const espBox = document.getElementById('espBox');
+    const espHP = document.getElementById('espHP');
+    const espCircle = document.getElementById('espCircle');
+    espBox.addEventListener('change', e => { console.log('ESP Box:', e.target.checked); });
+    espHP.addEventListener('change', e => { console.log('ESP HP:', e.target.checked); });
+    espCircle.addEventListener('change', e => { console.log('ESP Circle:', e.target.checked); });
   </script>
 </body>
 </html>
